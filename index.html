@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0f1216" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Holdout" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
+    <title>Holdout</title>
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+
+    <!-- Touch controls: a floating stick on the left, look on the right, buttons bottom-right -->
+    <div id="touch">
+      <div id="stick"><div id="stick-knob"></div></div>
+      <div class="buttons">
+        <button class="tbtn big" data-action="fire" aria-label="Fire"><span>FIRE</span></button>
+        <button class="tbtn" data-action="dash" aria-label="Dash"><i id="dash-cd"></i><span>DASH</span></button>
+        <button class="tbtn" data-action="jump" aria-label="Jump"><span>JUMP</span></button>
+        <button class="tbtn" data-action="reload" aria-label="Reload"><span>RELOAD</span></button>
+      </div>
+    </div>
+
+    <!-- In-game HUD -->
+    <div id="hud" class="layer">
+      <div id="crosshair"><span></span><span></span><span></span><span></span></div>
+      <div id="hitmarker"><span></span><span></span><span></span><span></span></div>
+      <div id="dmg-dir"><span></span></div>
+
+      <button id="btn-pause" class="icon-btn" aria-label="Pause">
+        <span></span><span></span>
+      </button>
+
+      <div class="top">
+        <div id="wave">GET READY</div>
+        <div id="enemies"></div>
+      </div>
+      <div class="score-box">
+        <div class="label">SCORE</div>
+        <div id="score">0</div>
+      </div>
+
+      <div class="health-box">
+        <div class="label">HEALTH <b id="health-text">100</b></div>
+        <div class="bar"><div id="health-fill"></div></div>
+      </div>
+      <div class="ammo-box">
+        <div class="label">RIFLE</div>
+        <div id="ammo">30 / 30</div>
+      </div>
+
+      <div id="combo">
+        <div id="combo-mult">×2</div>
+        <div id="combo-label">COMBO</div>
+        <div class="bar"><div id="combo-fill"></div></div>
+      </div>
+
+      <div id="banner-wrap">
+        <div id="banner"></div>
+        <div id="banner-sub"></div>
+      </div>
+    </div>
+
+    <div id="popups" class="layer"></div>
+    <div id="hurt" class="layer flash"></div>
+    <div id="heal" class="layer flash"></div>
+    <pre id="debug"></pre>
+
+    <!-- Screens -->
+    <div id="screen-start" class="screen">
+      <div class="panel">
+        <div class="kicker">ENDLESS ARENA SHOOTER</div>
+        <h1>HOLDOUT</h1>
+        <p class="lede">Survive the waves. Pick an upgrade after each one. How far can you get?</p>
+        <div id="best" class="best"></div>
+        <div class="controls kb-only">
+          <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>Move</span></div>
+          <div><kbd>Mouse</kbd><span>Look</span></div>
+          <div><kbd>Click</kbd><span>Fire (hold)</span></div>
+          <div><kbd>Shift</kbd><span>Dash</span></div>
+          <div><kbd>Space</kbd><span>Jump</span></div>
+          <div><kbd>R</kbd><span>Reload</span></div>
+        </div>
+        <div class="controls touch-only">
+          <div><kbd>Left thumb</kbd><span>Move</span></div>
+          <div><kbd>Right thumb</kbd><span>Look</span></div>
+          <div><kbd>FIRE</kbd><span>Hold to shoot</span></div>
+          <div><kbd>DASH</kbd><span>Dodge (brief immunity)</span></div>
+        </div>
+        <p class="hint portrait-only">Turn your phone sideways for the best view.</p>
+        <div class="settings">
+          <label class="toggle"><input type="checkbox" id="opt-autofire" /><span>Auto-fire when aiming at an enemy</span></label>
+          <label class="slider"><span>Look sensitivity</span><input type="range" id="opt-sens" min="0.4" max="2.2" step="0.1" /></label>
+        </div>
+        <button id="btn-start" class="primary">Start</button>
+      </div>
+    </div>
+
+    <div id="screen-pause" class="screen">
+      <div class="panel small">
+        <h2>PAUSED</h2>
+        <button id="btn-resume" class="primary">Resume</button>
+        <button id="btn-restart">Restart</button>
+        <p id="lock-hint">The browser needs a moment before it can capture the mouse again. Click Resume once more.</p>
+      </div>
+    </div>
+
+    <div id="screen-upgrade" class="screen">
+      <div class="panel wide">
+        <div class="kicker good" id="upgrade-kicker">WAVE CLEARED</div>
+        <h2>CHOOSE AN UPGRADE</h2>
+        <div class="cards" id="cards"></div>
+      </div>
+    </div>
+
+    <div id="screen-over" class="screen">
+      <div class="panel small">
+        <div class="kicker danger">YOU WERE OVERRUN</div>
+        <h2>GAME OVER</h2>
+        <div id="new-best" class="new-best">NEW BEST</div>
+        <div class="stats">
+          <div><span>Score</span><b id="over-score">0</b></div>
+          <div><span>Wave reached</span><b id="over-wave">0</b></div>
+          <div><span>Kills</span><b id="over-kills">0</b></div>
+          <div><span>Best combo</span><b id="over-combo">0</b></div>
+        </div>
+        <button id="btn-over-restart" class="primary">Play again</button>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

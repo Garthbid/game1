@@ -1,0 +1,12 @@
+{
+  "name": "Holdout",
+  "short_name": "Holdout",
+  "description": "Endless arena shooter. Survive the waves, pick upgrades, beat your best.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0f1216",
+  "theme_color": "#0f1216",
+  "icons": [{ "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
